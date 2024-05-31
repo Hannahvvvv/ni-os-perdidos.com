@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicativo para Niños Perdidos</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #72EDF2 10%, #5151E5 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .container.active {
+            display: flex;
+        }
+        button {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #ff6b81;
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen" class="container active">
+        <h1>Bienvenido</h1>
+        <button onclick="showMainScreen()">Comenzar</button>
+    </div>
+    <div id="main-screen" class="container">
+        <h1>Aplicativo para Niños Perdidos</h1>
+        <button onclick="startScanner()">Scanner</button>
+        <div id="output">
+            <h2>Datos del Niño Perdido:</h2>
+            <p>Nombre de la madre: <span id="motherName"></span></p>
+            <p>Nombre del padre: <span id="fatherName"></span></p>
+            <p>Teléfono de la madre: <span id="motherPhone"></span></p>
+            <p>Teléfono del padre: <span id="fatherPhone"></span></p>
+            <p>Número en caso de emergencias: <span id="emergencyPhone"></span></p>
+        </div>
+        <div id="qr-reader" style="width: 300px;"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script>
+        function showMainScreen() {
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('main-screen').classList.add('active');
+        }
+
+        function startScanner() {
+            const html5QrCode = new Html5Qrcode("qr-reader");
+            html5QrCode.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: 250
+                },
+                (decodedText) => {
+                    const data = JSON.parse(decodedText);
+                    document.getElementById("motherName").textContent = data.motherName;
+                    document.getElementById("fatherName").textContent = data.fatherName;
+                    document.getElementById("motherPhone").textContent = data.motherPhone;
+                    document.getElementById("fatherPhone").textContent = data.fatherPhone;
+                    document.getElementById("emergencyPhone").textContent = data.emergencyPhone;
+                    html5QrCode.stop().then((ignore) => {
+                        // QR Code scanning is stopped.
+                    }).catch((err) => {
+                        // Stop failed, handle it.
+                    });
+                },
+                (errorMessage) => {
+                    // parse error, ignore it.
+                })
+                .catch((err) => {
+                    // Start failed, handle it.
+                });
+        }
+    </script>
+</body>
+</html>
